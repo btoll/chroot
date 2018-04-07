@@ -1,6 +1,8 @@
 #!/bin/bash
 # Run as root!
 
+# TODO: Note that this assumes the chroot will be installed in /srv/chroot!
+
 if [ $EUID -ne 0 ]; then
     echo -e "$(tput setaf 1)[ERROR]$(tput sgr0) This script must be run as root!" 1>&2
     exit 1
@@ -16,7 +18,7 @@ usage() {
     echo "Args:"
     echo "-c : The name of the chroot jail."
     echo "-u : The name of the chroot user."
-    echo "-r : The name of the Debian release that will be bootstrapped in the jail (i.e., wheezy, jessie, etc)."
+    echo "-r : The name of the Debian release that will be bootstrapped in the jail (i.e., wheezy, jessie, stretch, etc)."
     echo
 }
 
@@ -66,15 +68,12 @@ echo -e "[$CHROOT_NAME]\
 \nroot-users=$CHROOT_USER\
 \nroot-groups=root" > /etc/schroot/chroot.d/$CHROOT_NAME
 
-# Specify the files that schroot will copy into the jail. These files MUST EXIST in the host environment!
-# We're appending so as not to overwrite schroot's defaults!
-echo -e "/etc/apt/sources.list\
-\n/srv/setup_chroot.sh\
-" >> /etc/schroot/default/copyfiles
+# Specify the files that schroot will copy into the jail on creation.
+echo "/etc/apt/sources.list" >> /etc/schroot/default/copyfiles
 
 # Don't mount the existing home dirs in the host environment!
-# 1. I symlink my dotfiles into my home dir, and they break across filesystems.
-# 2. I want a separate, untethered environment.
+# 1. Symlinked dotfiles break across filesystems.
+# 2. Want a separate, untethered environment.
 sed -i -r 's/^(\/home)/#\1/' /etc/schroot/default/fstab
 
 # Create the dir where the jail is installed.
