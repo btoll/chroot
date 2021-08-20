@@ -61,8 +61,21 @@ fi
 echo "$INFO Installing the chroot to $CHROOT_DIR.  This can take \"a while\" depending on your system resources..."
 
 # Dependencies.
-echo "$INFO Installing debootstrap and schroot."
-apt-get install debootstrap schroot -y
+echo "$INFO Installing debootstrap and schroot, if missing."
+
+DEPS=(
+    debootstrap
+    schroot
+)
+
+for dep in "${DEPS[@]}"
+do
+    if ! command -v "$dep" > /dev/null
+    then
+        apt-get install --no-install-recommends --yes "$dep"
+        echo "$INFO Installed package dependency \`$dep\`."
+    fi
+done
 
 # Create a config entry for the jail.
 echo "$INFO Installing schroot config to /etc/schroot/chroot.d/$CHROOT_NAME."
