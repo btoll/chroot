@@ -102,7 +102,9 @@ mkdir -p "$CHROOT_DIR/$CHROOT_NAME"
 
 # Finally, create the jail itself.
 #debootstrap --no-check-gpg $DEBIAN_RELEASE /srv/chroot/$CHROOT_NAME file:///home/$CHROOT_USER/mnt
-if debootstrap "$DEBIAN_RELEASE" "/srv/chroot/$CHROOT_NAME" http://ftp.debian.org/debian
+if debootstrap \
+    --variant=minbase \
+    "$DEBIAN_RELEASE" "$CHROOT_DIR/$CHROOT_NAME" http://deb.debian.org/debian
 then
     # See /etc/schroot/default/copyfiles for files to be copied into the new chroot.
     echo "$SUCCESS Chroot installed in $CHROOT_DIR/$CHROOT_NAME!"
