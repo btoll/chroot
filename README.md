@@ -9,7 +9,7 @@
 
 ## Establish and bootstrap chroot jail
 
-Run `install_chroot.sh`.
+Run `install.sh`.
 
 The script will do the following:
 
@@ -51,7 +51,7 @@ root-groups=root
 
 > Make sure to read the [schroot(1)] and [schroot.conf(5)] man pages!  I've left out a lot of detail here!
 >
-> For example, I'm configuring the files in `/etc/schroot/default/` because I've specified `directory` as the chroot type in the config in the `install_chroot.sh` script. If you provide your own chroot config with a different `type` value, you'll have to alter the scripts in a different dir under `/etc/schroot`.
+> For example, I'm configuring the files in `/etc/schroot/default/` because I've specified `directory` as the chroot type in the config in the `install.sh` script. If you provide your own chroot config with a different `type` value, you'll have to alter the scripts in a different dir under `/etc/schroot`.
 
 That's it, you're done!  You can now change (root) to your new chroot by issuing the following commmand:
 

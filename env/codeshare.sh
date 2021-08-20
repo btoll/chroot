@@ -25,7 +25,7 @@ apt-get update
 # Have schroot install these packages?
 apt-get install build-essential curl git tmux vim -y
 
-# Yes, I know I could have schroot mount the home dirs, but I don't want it to (and see comment in ./install_chroot.sh)!
+# Yes, I know I could have schroot mount the home dirs, but I don't want it to (and see comment in ./install.sh)!
 if echo -e "asdf\nasdf\n$ADDUSER\n\n\n\n\n" | adduser "$ADDUSER"
 then
     echo -e "\n$(tput setaf 4)[INFO]$(tput sgr0) Added user $ADDUSER"
