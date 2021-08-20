@@ -17,9 +17,9 @@ usage() {
     echo "Usage: $0 [args]"
     echo
     echo "Args:"
-    echo "-c : The name of the chroot jail."
-    echo "-u : The name of the chroot user."
-    echo "-r : The name of the Debian release that will be bootstrapped in the jail:"
+    echo "-c, --chroot   : The name of the chroot jail."
+    echo "-u, --user     : The name of the chroot user."
+    echo "-r, --release  : The name of the Debian release that will be bootstrapped in the jail:"
     echo "      - wheezy    (7)"
     echo "      - jessie    (8)"
     echo "      - stretch   (9)"
@@ -37,10 +37,10 @@ while [ "$#" -gt 0 ]
 do
     OPT="$1"
     case $OPT in
-        -c) shift; CHROOT_NAME=$1 ;;
-        -u) shift; CHROOT_USER=$1 ;;
-        -r) shift; DEBIAN_RELEASE=$1 ;;
-        -h) usage 0 ;;
+        -c|--chroot) shift; CHROOT_NAME=$1 ;;
+        -u|--user) shift; CHROOT_USER=$1 ;;
+        -r|--release) shift; DEBIAN_RELEASE=$1 ;;
+        -h|--help) usage 0 ;;
     esac
     shift
 done
