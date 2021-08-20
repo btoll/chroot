@@ -5,6 +5,7 @@ set -eo pipefail
 
 # TODO: Note that this assumes the chroot will be installed in /srv/chroot!
 
+CHROOT_DIR=/srv/chroot
 CHROOT_NAME=
 CHROOT_USER=
 DEBIAN_RELEASE=
@@ -18,6 +19,7 @@ usage() {
     echo
     echo "Args:"
     echo "-c, --chroot   : The name of the chroot jail."
+    echo "-d, --dir      : The directory in which to install the chroot (defaults to /srv/chroot)."
     echo "-u, --user     : The name of the chroot user."
     echo "-r, --release  : The name of the Debian release that will be bootstrapped in the jail:"
     echo "      - wheezy    (7)"
@@ -38,6 +40,7 @@ do
     OPT="$1"
     case $OPT in
         -c|--chroot) shift; CHROOT_NAME=$1 ;;
+        -d|--dir) shift; CHROOT_DIR=$1 ;;
         -u|--user) shift; CHROOT_USER=$1 ;;
         -r|--release) shift; DEBIAN_RELEASE=$1 ;;
         -h|--help) usage 0 ;;
@@ -69,7 +72,7 @@ echo "$INFO Installing schroot config."
 echo -e "[$CHROOT_NAME]\
 \ndescription=Debian ($DEBIAN_RELEASE)\
 \ntype=directory\
-\ndirectory=/srv/chroot/$CHROOT_NAME\
+\ndirectory=$CHROOT_DIR/$CHROOT_NAME\
 \nusers=$CHROOT_USER\
 \ngroups=sbuild\
 \nroot-users=$CHROOT_USER\
@@ -84,14 +87,14 @@ echo "/etc/apt/sources.list" >> /etc/schroot/default/copyfiles
 sed -i -r 's/^(\/home)/#\1/' /etc/schroot/default/fstab
 
 # Create the dir where the jail is installed.
-mkdir -p "/srv/chroot/$CHROOT_NAME"
+mkdir -p "$CHROOT_DIR/$CHROOT_NAME"
 
 # Finally, create the jail itself.
 #debootstrap --no-check-gpg $DEBIAN_RELEASE /srv/chroot/$CHROOT_NAME file:///home/$CHROOT_USER/mnt
 if debootstrap "$DEBIAN_RELEASE" "/srv/chroot/$CHROOT_NAME" http://ftp.debian.org/debian
 then
     # See /etc/schroot/default/copyfiles for files to be copied into the new chroot.
-    echo "$SUCCESS Chroot installed in /srv/chroot/$CHROOT_NAME!"
+    echo "$SUCCESS Chroot installed in $CHROOT_DIR/$CHROOT_NAME!"
     echo "$INFO You can now enter the chroot by issuing the following command:"
     echo -e "\n\tschroot -u $CHROOT_USER -c $CHROOT_NAME\n"
     echo Have fun! Weeeeeeeeeeeee
