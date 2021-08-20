@@ -5,15 +5,13 @@ set -eo pipefail
 
 # TODO: Note that this assumes the chroot will be installed in /srv/chroot!
 
-if [ $EUID -ne 0 ]
-then
-    echo -e "$(tput setaf 1)[ERROR]$(tput sgr0) This script must be run as root!" 1>&2
-    exit 1
-fi
-
 CHROOT_NAME=
 CHROOT_USER=
 DEBIAN_RELEASE=
+
+ERROR="$(tput setaf 1)[ERROR]$(tput sgr0)"
+INFO="$(tput setaf 4)[INFO]$(tput sgr0)"
+SUCCESS="$(tput setaf 2)[SUCCESS]$(tput sgr0)"
 
 usage() {
     echo "Usage: $0 [args]"
@@ -21,14 +19,18 @@ usage() {
     echo "Args:"
     echo "-c : The name of the chroot jail."
     echo "-u : The name of the chroot user."
-    echo "-r : The name of the Debian release that will be bootstrapped in the jail (i.e., wheezy, jessie, stretch, etc)."
-    echo
+    echo "-r : The name of the Debian release that will be bootstrapped in the jail:"
+    echo "      - wheezy    (7)"
+    echo "      - jessie    (8)"
+    echo "      - stretch   (9)"
+    echo "      - buster   (10)"
+    echo "      - bullseye (11)"
+    exit "$1"
 }
 
 if [ "$#" -eq 0 ]
 then
-    usage
-    exit 1
+    usage 1
 fi
 
 while [ "$#" -gt 0 ]
@@ -38,35 +40,32 @@ do
         -c) shift; CHROOT_NAME=$1 ;;
         -u) shift; CHROOT_USER=$1 ;;
         -r) shift; DEBIAN_RELEASE=$1 ;;
-        -h) usage; exit 0 ;;
+        -h) usage 0 ;;
     esac
     shift
 done
 
-if [ -z "$CHROOT_NAME" ]
+if [ $EUID -ne 0 ]
 then
-    echo "$(tput setaf 1)[ERROR]$(tput sgr0) No chroot name specified."
+    echo -e "$ERROR This script must be run as root!" 1>&2
     exit 1
 fi
 
-if [ -z "$CHROOT_USER" ]
+if [ -z "$CHROOT_NAME" ] || [ -z "$CHROOT_USER" ] || [ -z "$DEBIAN_RELEASE" ]
 then
-    echo "$(tput setaf 1)[ERROR]$(tput sgr0) No chroot user specified."
+    echo "$ERROR The CHROOT_NAME, CHROOT_USER and DEBIAN_RELEASE must all be specified." 1>&2
     exit 1
 fi
 
-if [ -z "$DEBIAN_RELEASE" ]
-then
-    echo "$(tput setaf 1)[ERROR]$(tput sgr0) No debian release specified."
-    exit 1
-fi
-
-echo "$(tput setaf 4)[INFO]$(tput sgr0) Installing the chroot will take several minutes."
+echo "$INFO Installing the chroot can take several minutes depending on your system resources..."
 
 # Dependencies.
+echo "$INFO Installing debootstrap and schroot."
 apt-get install debootstrap schroot -y
 
 # Create a config entry for the jail.
+echo "$INFO Installing schroot config."
+
 echo -e "[$CHROOT_NAME]\
 \ndescription=Debian ($DEBIAN_RELEASE)\
 \ntype=directory\
@@ -92,8 +91,12 @@ mkdir -p "/srv/chroot/$CHROOT_NAME"
 if debootstrap "$DEBIAN_RELEASE" "/srv/chroot/$CHROOT_NAME" http://ftp.debian.org/debian
 then
     # See /etc/schroot/default/copyfiles for files to be copied into the new chroot.
-    echo "$(tput setaf 2)[SUCCESS]$(tput sgr0) Chroot installed in /srv/chroot/$CHROOT_NAME"
+    echo "$SUCCESS Chroot installed in /srv/chroot/$CHROOT_NAME!"
+    echo "$INFO You can now enter the chroot by issuing the following command:"
+    echo -e "\n\tschroot -u $CHROOT_USER -c $CHROOT_NAME\n"
+    echo Have fun! Weeeeeeeeeeeee
 else
-    echo "$(tput setaf 1)[ERROR]$(tput sgr0) Something went terribly wrong." 1>&2
+    echo "$ERROR Something went terribly wrong!" 1>&2
+    echo "$ERROR Are you trying to overwrite an existing chroot?" 1>&2
 fi
 
