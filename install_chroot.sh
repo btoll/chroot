@@ -1,9 +1,12 @@
 #!/bin/bash
 # Run as root!
 
+set -eo pipefail
+
 # TODO: Note that this assumes the chroot will be installed in /srv/chroot!
 
-if [ $EUID -ne 0 ]; then
+if [ $EUID -ne 0 ]
+then
     echo -e "$(tput setaf 1)[ERROR]$(tput sgr0) This script must be run as root!" 1>&2
     exit 1
 fi
@@ -22,12 +25,14 @@ usage() {
     echo
 }
 
-if [ "$#" -eq 0 ]; then
+if [ "$#" -eq 0 ]
+then
     usage
     exit 1
 fi
 
-while [ "$#" -gt 0 ]; do
+while [ "$#" -gt 0 ]
+do
     OPT="$1"
     case $OPT in
         -c) shift; CHROOT_NAME=$1 ;;
@@ -38,17 +43,20 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
-if [ -z $CHROOT_NAME ]; then
+if [ -z "$CHROOT_NAME" ]
+then
     echo "$(tput setaf 1)[ERROR]$(tput sgr0) No chroot name specified."
     exit 1
 fi
 
-if [ -z $CHROOT_USER ]; then
+if [ -z "$CHROOT_USER" ]
+then
     echo "$(tput setaf 1)[ERROR]$(tput sgr0) No chroot user specified."
     exit 1
 fi
 
-if [ -z $DEBIAN_RELEASE ]; then
+if [ -z "$DEBIAN_RELEASE" ]
+then
     echo "$(tput setaf 1)[ERROR]$(tput sgr0) No debian release specified."
     exit 1
 fi
@@ -66,7 +74,7 @@ echo -e "[$CHROOT_NAME]\
 \nusers=$CHROOT_USER\
 \ngroups=sbuild\
 \nroot-users=$CHROOT_USER\
-\nroot-groups=root" > /etc/schroot/chroot.d/$CHROOT_NAME
+\nroot-groups=root" > "/etc/schroot/chroot.d/$CHROOT_NAME"
 
 # Specify the files that schroot will copy into the jail on creation.
 echo "/etc/apt/sources.list" >> /etc/schroot/default/copyfiles
@@ -77,13 +85,12 @@ echo "/etc/apt/sources.list" >> /etc/schroot/default/copyfiles
 sed -i -r 's/^(\/home)/#\1/' /etc/schroot/default/fstab
 
 # Create the dir where the jail is installed.
-mkdir -p /srv/chroot/$CHROOT_NAME
+mkdir -p "/srv/chroot/$CHROOT_NAME"
 
 # Finally, create the jail itself.
 #debootstrap --no-check-gpg $DEBIAN_RELEASE /srv/chroot/$CHROOT_NAME file:///home/$CHROOT_USER/mnt
-debootstrap $DEBIAN_RELEASE /srv/chroot/$CHROOT_NAME http://ftp.debian.org/debian
-
-if [ $? -eq 0 ]; then
+if debootstrap "$DEBIAN_RELEASE" "/srv/chroot/$CHROOT_NAME" http://ftp.debian.org/debian
+then
     # See /etc/schroot/default/copyfiles for files to be copied into the new chroot.
     echo "$(tput setaf 2)[SUCCESS]$(tput sgr0) Chroot installed in /srv/chroot/$CHROOT_NAME"
 else

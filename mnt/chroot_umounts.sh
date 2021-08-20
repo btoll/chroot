@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 umount /srv/chroot/codeshare/proc
 umount /srv/chroot/codeshare/sys
 umount /dev /srv/chroot/codeshare/dev
