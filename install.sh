@@ -1,18 +1,16 @@
 #!/bin/bash
 # Run as root!
 
-set -eo pipefail
-
-# TODO: Note that this assumes the chroot will be installed in /srv/chroot!
+set -euo pipefail
 
 CHROOT_DIR=/srv/chroot
 CHROOT_NAME=
 CHROOT_USER=
 DEBIAN_RELEASE=
 
-ERROR="$(tput setaf 1)[ERROR]$(tput sgr0)"
-INFO="$(tput setaf 4)[INFO]$(tput sgr0)"
-SUCCESS="$(tput setaf 2)[SUCCESS]$(tput sgr0)"
+ERROR="$(tput setaf 3)[$0]$(tput setaf 1)[ERROR]$(tput sgr0)"
+INFO="$(tput setaf 3)[$0]$(tput setaf 4)[INFO]$(tput sgr0)"
+SUCCESS="$(tput setaf 3)[$0]$(tput setaf 2)[SUCCESS]$(tput sgr0)"
 
 usage() {
     echo "Usage: $0 [args]"
@@ -60,14 +58,14 @@ then
     exit 1
 fi
 
-echo "$INFO Installing the chroot can take several minutes depending on your system resources..."
+echo "$INFO Installing the chroot to $CHROOT_DIR.  This can take \"a while\" depending on your system resources..."
 
 # Dependencies.
 echo "$INFO Installing debootstrap and schroot."
 apt-get install debootstrap schroot -y
 
 # Create a config entry for the jail.
-echo "$INFO Installing schroot config."
+echo "$INFO Installing schroot config to /etc/schroot/chroot.d/$CHROOT_NAME."
 
 echo -e "[$CHROOT_NAME]\
 \ndescription=Debian ($DEBIAN_RELEASE)\
