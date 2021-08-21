@@ -20,17 +20,34 @@ The script will do the following:
 - Install debootstrap and schroot.
 - Create the following chroot definition in `/etc/schroot/chroot.d/$CHROOT_NAME`:
 
-```
-[$CHROOT_NAME]
-description=Debian ($DEBIAN_RELEASE)
-type=plain
-directory=$CHROOT_DIR/$CHROOT_NAME
-personality=$PERSONALITY
-users=$CHROOT_USER
-root-users=$CHROOT_USER
-groups=$CHROOT_GROUP
-root-groups=$CHROOT_GROUP
-```
+    For example, let's do a dry run of the following command:
+
+    ```
+    $ sudo ./install.sh \
+    > --chroot onion \
+    > --group sudo \
+    > --release bullseye \
+    > --type directory \
+    > --profile minimal \
+    > --dry-run
+    ```
+
+    This will produce the following chroot config:
+
+    ```
+    [onion]
+    description=Debian (bullseye)
+    type=directory
+    directory=/srv/chroot/onion
+    personality=linux
+    profile=minimal
+    users=
+    root-users=
+    groups=sudo
+    root-groups=sudo
+    ```
+
+    If the command is run again without the `--dry-run` flag, it will install this configuration to `/etc/schroot/chroot.d/onion` and proceed to create the chroot.
 
 - Create the jail in `$CHROOT_DIR` (defaults to `/srv/chroot`). It does this by downloading the version of Debian specified on the command line from `http://deb.debian.org/debian`.
 
@@ -53,7 +70,6 @@ That's it, you're done!  You can now change (root) to your new chroot by issuing
 <!--
 > Note that if `proc` and `dev/pts` aren't mounted in the chroot, you will not have a `pty` when logging in.  `tmux` and other programs will appear not to launch, and when running the `tty` program, you'll be told `not a tty`.
 > To fix this, run `mnt/chroot_mounts.sh` (and its brother `mnt/chroot_umounts.sh`) in the host environment.
--->
 
 The rest of this document describes optional chroot environment configurations and notes.
 
@@ -81,7 +97,6 @@ The rest of this document describes optional chroot environment configurations a
             AllowTcpForwarding no
     ```
 
-<!--
 # Notes
 
 ### Installing NodeJS

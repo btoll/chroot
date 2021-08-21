@@ -4,11 +4,14 @@
 set -euo pipefail
 
 CHROOT_DIR=/srv/chroot
+CHROOT_GROUP=
 CHROOT_NAME=
 CHROOT_USER=
-CHROOT_GROUP=
 DEBIAN_RELEASE=
+DRY_RUN=false
 PERSONALITY=linux
+PROFILE=
+TYPE=plain
 
 ERROR="$(tput setaf 3)[$0]$(tput setaf 1)[ERROR]$(tput sgr0)"
 INFO="$(tput setaf 3)[$0]$(tput setaf 4)[INFO]$(tput sgr0)"
@@ -20,9 +23,10 @@ usage() {
     echo "Args:"
     echo "-c, --chroot   : The name of the chroot jail."
     echo "-d, --dir      : The directory in which to install the chroot (defaults to /srv/chroot)."
+    echo "--dry-run      : Write the config to STDOUT and exit (will not run the program)."
     echo "-u, --user     : The name of the chroot user. Must be a user on the host machine."
     echo "-g, --group    : The name of the chroot group. Must be a group on the host machine."
-    echo "-r, --release  : The name of the Debian release that will be bootstrapped in the jail:"
+    echo "-r, --release  : The Debian release that will be bootstrapped in the jail:"
     echo "--32           : Set this flag if the chroot is to be 32-bit on a 64-bit system."
     echo "      - jessie    (8)"
     echo "      - stretch   (9)"
@@ -40,13 +44,16 @@ while [ "$#" -gt 0 ]
 do
     OPT="$1"
     case $OPT in
+        --32) PERSONALITY=linux32 ;;
         -c|--chroot) shift; CHROOT_NAME=$1 ;;
         -d|--dir) shift; CHROOT_DIR=$1 ;;
-        -u|--user) shift; CHROOT_USER=$1 ;;
+        --dry-run) DRY_RUN=true ;;
         -g|--group) shift; CHROOT_GROUP=$1 ;;
-        -r|--release) shift; DEBIAN_RELEASE=$1 ;;
-        --32) PERSONALITY=linux32 ;;
         -h|--help) usage 0 ;;
+        -p|--profile) shift; PROFILE=$1 ;;
+        -r|--release) shift; DEBIAN_RELEASE=$1 ;;
+        -t|--type) shift; TYPE=$1 ;;
+        -u|--user) shift; CHROOT_USER=$1 ;;
     esac
     shift
 done
@@ -67,6 +74,23 @@ if [ -z "$CHROOT_USER" ] && [ -z "$CHROOT_GROUP" ]
 then
     echo "$ERROR The CHROOT_USER or the CHROOT_GROUP must be specified." 1>&2
     exit 1
+fi
+
+CONFIG="[$CHROOT_NAME]\
+\ndescription=Debian ($DEBIAN_RELEASE)\
+\ntype=$TYPE\
+\ndirectory=$CHROOT_DIR/$CHROOT_NAME\
+\npersonality=$PERSONALITY\
+\nprofile=$PROFILE\
+\nusers=$CHROOT_USER\
+\nroot-users=$CHROOT_USER\
+\ngroups=$CHROOT_GROUP\
+\nroot-groups=$CHROOT_GROUP"
+
+if "$DRY_RUN"
+then
+    echo -e "$CONFIG"
+    exit 0
 fi
 
 echo "$INFO Installing the chroot to $CHROOT_DIR/$CHROOT_NAME.  This can take \"a while\" depending on your system resources..."
@@ -90,15 +114,7 @@ done
 echo "$INFO Installing schroot config to /etc/schroot/chroot.d/$CHROOT_NAME."
 
 # Note that "plain" schroot types (the default) don't run setup scripts and mount filesystems.
-echo -e "[$CHROOT_NAME]\
-\ndescription=Debian ($DEBIAN_RELEASE)\
-\ntype=plain\
-\ndirectory=$CHROOT_DIR/$CHROOT_NAME\
-\npersonality=$PERSONALITY\
-\nusers=$CHROOT_USER\
-\nroot-users=$CHROOT_USER\
-\ngroups=$CHROOT_GROUP\
-\nroot-groups=$CHROOT_GROUP" > "/etc/schroot/chroot.d/$CHROOT_NAME"
+echo -e "$CONFIG" > "/etc/schroot/chroot.d/$CHROOT_NAME"
 
 # Create the dir where the jail is installed.
 mkdir -p "$CHROOT_DIR/$CHROOT_NAME"
