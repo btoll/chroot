@@ -1,6 +1,10 @@
 # Installing chroot
 
-- Installs Debian
+- Installs Debian, currently:
+    + jessie
+    + stretch
+    + buster
+    + bullseye
 
 ## Dependencies
 
@@ -19,25 +23,16 @@ The script will do the following:
 ```
 [$CHROOT_NAME]
 description=Debian ($DEBIAN_RELEASE)
-type=directory
-directory=/srv/chroot/$CHROOT_NAME
+type=plain
+directory=$CHROOT_DIR/$CHROOT_NAME
+personality=$PERSONALITY
 users=$CHROOT_USER
-groups=sbuild
 root-users=$CHROOT_USER
-root-groups=root
+groups=$CHROOT_GROUP
+root-groups=$CHROOT_GROUP
 ```
 
-- Append the following file(s) to `/etc/schroot/default/copyfiles` which will then be copied into the jail (note these files must exist in the host environment):
-
-```
-/etc/apt/sources.list
-```
-
-- Comment-out the `/home` mount point in `/etc/schroot/default/fstab`. I don't want `/home` mounted because:
-    + I symlink my dotfiles into my home dir, and they break across filesystems.
-    + I want a separate, untethered environment.
-
-- Create the jail in `/srv/chroot/$CHROOT_NAME`. It does this by downloading the version of Debian specified on the command line from `http://ftp.debian.org/debian`.
+- Create the jail in `$CHROOT_DIR` (defaults to `/srv/chroot`). It does this by downloading the version of Debian specified on the command line from `http://deb.debian.org/debian`.
 
     Note that if you're bandwidth-impaired like me, you can create the chroot by pointing `debootstrap` to a mounted image.
 
@@ -47,18 +42,18 @@ root-groups=root
         mount debian_image.iso foo
         debootstrap stretch /srv/chroot/test file:///usr/local/src/iso/debian/free/foo
 
-    If you get an error message about GPG, add the `--no-check-gpg` flag to the `debootstrap` command.
+    If you get an error message about GPG, you can add the `--no-check-gpg` flag to the `debootstrap` command.  But don't lay any blame on my doorstep when things south.
 
 > Make sure to read the [schroot(1)] and [schroot.conf(5)] man pages!  I've left out a lot of detail here!
->
-> For example, I'm configuring the files in `/etc/schroot/default/` because I've specified `directory` as the chroot type in the config in the `install.sh` script. If you provide your own chroot config with a different `type` value, you'll have to alter the scripts in a different dir under `/etc/schroot`.
 
 That's it, you're done!  You can now change (root) to your new chroot by issuing the following commmand:
 
-    schroot -u $CHROOT_USER -c $CHROOT_NAME
+    schroot --directory / -u $CHROOT_USER -c $CHROOT_NAME
 
+<!--
 > Note that if `proc` and `dev/pts` aren't mounted in the chroot, you will not have a `pty` when logging in.  `tmux` and other programs will appear not to launch, and when running the `tty` program, you'll be told `not a tty`.
 > To fix this, run `mnt/chroot_mounts.sh` (and its brother `mnt/chroot_umounts.sh`) in the host environment.
+-->
 
 The rest of this document describes optional chroot environment configurations and notes.
 
@@ -86,6 +81,7 @@ The rest of this document describes optional chroot environment configurations a
             AllowTcpForwarding no
     ```
 
+<!--
 # Notes
 
 ### Installing NodeJS
@@ -118,6 +114,7 @@ sudo apt-get install "libstdc++6:i386"
 ```
 
 In this example, all users that should be jailed upon remote login should belong to the `codeshare` group.
+-->
 
 [debootstrap]: https://packages.debian.org/stretch/debootstrap
 [schroot]: https://packages.debian.org/stretch/schroot
