@@ -11,6 +11,25 @@
 - [debootstrap]
 - [schroot]
 
+## Usage
+
+```
+Usage: ./install.sh [args]
+
+Args:
+-c, --chroot   : The name of the chroot jail.
+-d, --dir      : The directory in which to install the chroot (defaults to /srv/chroot).
+-u, --user     : The name of the chroot user. Must be a user on the host machine.
+-g, --group    : The name of the chroot group. Must be a group on the host machine.
+--32           : Set this flag if the chroot is to be 32-bit on a 64-bit system.
+--dry-run      : Write the config to STDOUT and exit (will not run the program).
+-r, --release  : The Debian release that will be bootstrapped in the jail:
+      - jessie    (8)
+      - stretch   (9)
+      - buster   (10)
+      - bullseye (11)
+```
+
 ## Establish and bootstrap chroot jail
 
 Run `install.sh`.
@@ -24,12 +43,12 @@ The script will do the following:
 
     ```
     sudo ./install.sh \
-    > --chroot onion \
-    > --group sudo \
-    > --release bullseye \
-    > --type directory \
-    > --profile minimal \
-    > --dry-run
+    --chroot onion \
+    --group sudo \
+    --release bullseye \
+    --type directory \
+    --profile minimal \
+    --dry-run
     ```
 
     This will produce the following chroot config:
