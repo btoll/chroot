@@ -23,7 +23,7 @@ The script will do the following:
     For example, let's do a dry run of the following command:
 
     ```
-    $ sudo ./install.sh \
+    sudo ./install.sh \
     > --chroot onion \
     > --group sudo \
     > --release bullseye \
