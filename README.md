@@ -68,12 +68,12 @@ Some definitions are taken directly from the [schroot.conf(5)] man page.
 
 - `directory`
     + The directory containing the chroot environment. This is where the root will be changed to when executing a login shell or a command.
-    + The directory must exist and have read and execute permissions to allow users access to it. Note that on Linux systems it will be bind-mounted elsewhere for use as a chroot; the directory for 'plain' chroots is mounted with the --rbind option to [mount(8)], while for 'directory' chroots --bind is used instead so that sub-mounts are not preserved (they should be set in the fstab file just like in `/etc/fstab` on the host).
+    + The directory must exist and have read and execute permissions to allow users access to it. Note that on Linux systems it will be bind-mounted elsewhere for use as a chroot; the directory for 'plain' chroots is mounted with the `--rbind` option to [mount(8)], while for 'directory' chroots `--bind` is used instead so that sub-mounts are not preserved (they should be set in the fstab file just like in `/etc/fstab` on the host).
     + This option is mandatory when used with 'plain' and 'directory' types, which are the only types that the wrapper tool uses.
 
 - `personality`
     + Set the personality (process execution domain) to use. This option is useful when using a 32-bit chroot on 64-bit system, for example. The default value is 'linux'. For a 32-bit chroot on a 64-bit system, 'linux32' is the option required.
-    + Defaults to 'linux'.  Changes the value to 'linux32' if the '--32' flag is present.
+    + Defaults to 'linux'.  Changes the value to 'linux32' if the `--32` flag is present.
 
 - `profile`
     + References one of the default directories inside `/etc/schroot`:
@@ -112,7 +112,7 @@ Please read the [schroot.conf(5)] man page for complete coverage of all of the `
 
 ## `schroot` profiles
 
-`schroot` profiles are a nice feature that allows `chroot`s to have more or less bootstrapped on creation.  It controls the files that are copied from the host, what filesystems are mounted and which system databases (like `/etc/passwd`) to copy into the `chroot` from the host.
+`schroot` profiles are a nice feature that allows `chroot`s to be more or less bootstrapped on creation.  It controls the files that are copied from the host, what filesystems are mounted and which system databases (like `/etc/passwd`) to copy into the `chroot` from the host.
 
 For example, to have a minimum `chroot` environment with just the base OS, use the 'plain' `type` (`type=plain`), or omit it as it's the default.  This value doesn't trigger `schroot` to copy any files or mount any filesystems into the `chroot` environment.
 
@@ -122,7 +122,7 @@ This is important as it will expose more of the host into the `chroot` environme
 
 There are other profiles, such as `desktop`, which are more liberal in what they copy and mount, and may serve other use cases quite well.
 
-Though perhaps not technically accurate, I think of `type=directory` as "turning on" the ability to copy files and mount filesystems and of profiles as a use case, which may or may not fit your project.
+Though perhaps not technically accurate, I think of `type=directory` as "turning on" the ability to copy files and mount filesystems, and of profiles as a use case, where some may fit your project better than others.
 
 > Although `schroot` supports the use of custom scripts, the wrapper tool (currently) does not.
 
@@ -164,7 +164,7 @@ The script will do the following:
 
     If the command is run again without the `--dry-run` flag, it will install this configuration to `/etc/schroot/chroot.d/onion` and proceed to create the chroot.
 
-- Create the jail in `$CHROOT_DIR` (defaults to `/srv/chroot`). It does this by downloading the version of Debian specified on the command line from `http://deb.debian.org/debian`.
+- Create the jail in `$CHROOT_DIR` (defaults to `/srv/chroot`). It does this by downloading the version of Debian (specified on the command line) from `http://deb.debian.org/debian`.
 
 > Make sure to read the [schroot(1)] and [schroot.conf(5)] man pages!  I've left out a lot of detail here!
 
