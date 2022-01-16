@@ -4,7 +4,11 @@
 
 Install a minimal Debian build in a `chroot` environment!
 
-Here's a fine article that is a gripping read!  [On Running a Tor Onion Service in a Chroot](https://www.benjamintoll.com/2021/08/20/on-running-a-tor-onion-service-in-a-chroot/)
+Here's a fine article and a gripping read!  [On Running a Tor Onion Service in a Chroot]
+
+### That's great, but why?
+
+Creating a chroot by hand is cumbersome and error-prone.  This tool removes the headache by installing a [rootfs] for you.
 
 ## Version support
 
@@ -172,6 +176,8 @@ That's it, you're done!  You can now change (root) to your new chroot by issuing
 
     schroot --directory / -u $CHROOT_USER -c $CHROOT_NAME
 
+[On Running a Tor Onion Service in a Chroot]: https://www.benjamintoll.com/2021/08/20/on-running-a-tor-onion-service-in-a-chroot/
+[rootfs]: https://tldp.org/LDP/sag/html/root-fs.html
 [debootstrap]: https://packages.debian.org/stretch/debootstrap
 [schroot]: https://packages.debian.org/stretch/schroot
 [INI files]: https://en.wikipedia.org/wiki/INI_file
