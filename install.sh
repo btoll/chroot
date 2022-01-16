@@ -3,6 +3,7 @@
 
 set -euo pipefail
 
+ARCH=amd64
 CHROOT_DIR=/srv/chroot
 CHROOT_GROUP=
 CHROOT_NAME=
@@ -125,6 +126,7 @@ mkdir -p "$CHROOT_DIR/$CHROOT_NAME"
 # Finally, create the jail itself.
 #debootstrap --no-check-gpg $DEBIAN_RELEASE /srv/chroot/$CHROOT_NAME file:///home/$CHROOT_USER/mnt
 if debootstrap \
+    --arch="$ARCH" \
     --variant=minbase \
     "$DEBIAN_RELEASE" "$CHROOT_DIR/$CHROOT_NAME" http://deb.debian.org/debian
 then
