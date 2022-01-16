@@ -1,7 +1,33 @@
 #!/bin/bash
-# Run as root!
 
 set -euo pipefail
+
+if [ $EUID -ne 0 ]
+then
+    echo -e "$ERROR This script must be run as root!" 1>&2
+    exit 1
+fi
+
+echo "$INFO Installing debootstrap and schroot, if missing."
+DEPS=(
+    debootstrap
+    schroot
+)
+
+for dep in "${DEPS[@]}"
+do
+    if ! command -v "$dep" > /dev/null
+    then
+        echo "$INFO Installing missing dependency \`$dep\`."
+        apt-get install --no-install-recommends --yes "$dep"
+    fi
+done
+
+if ! command -v tput > /dev/null
+then
+    echo "$INFO Installing missing dependency \`$dep\`."
+    apt-get install --no-install-recommends --yes ncurses-bin
+fi
 
 ARCH=amd64
 CHROOT_DIR=/srv/chroot
@@ -62,12 +88,6 @@ do
     shift
 done
 
-if [ $EUID -ne 0 ]
-then
-    echo -e "$ERROR This script must be run as root!" 1>&2
-    exit 1
-fi
-
 if [ -z "$CHROOT_NAME" ] || [ -z "$DEBIAN_RELEASE" ]
 then
     echo "$ERROR The CHROOT_NAME and the DEBIAN_RELEASE must be specified." 1>&2
@@ -98,21 +118,6 @@ then
 fi
 
 echo "$INFO Installing the chroot to $CHROOT_DIR/$CHROOT_NAME.  This can take \"a while\" depending on your system resources..."
-echo "$INFO Installing debootstrap and schroot, if missing."
-
-DEPS=(
-    debootstrap
-    schroot
-)
-
-for dep in "${DEPS[@]}"
-do
-    if ! command -v "$dep" > /dev/null
-    then
-        echo "$INFO Installing package dependency \`$dep\`."
-        apt-get install --no-install-recommends --yes "$dep"
-    fi
-done
 
 # Create a config entry for the jail.
 echo "$INFO Installing schroot config to /etc/schroot/chroot.d/$CHROOT_NAME."
