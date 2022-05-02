@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+ERROR="$(tput setaf 3)[$0]$(tput setaf 1)[ERROR]$(tput sgr0)"
+INFO="$(tput setaf 3)[$0]$(tput setaf 4)[INFO]$(tput sgr0)"
+SUCCESS="$(tput setaf 3)[$0]$(tput setaf 2)[SUCCESS]$(tput sgr0)"
+
 if [ $EUID -ne 0 ]
 then
     echo -e "$ERROR This script must be run as root!" 1>&2
@@ -39,10 +43,6 @@ DRY_RUN=false
 PERSONALITY=linux
 PROFILE=
 TYPE=plain
-
-ERROR="$(tput setaf 3)[$0]$(tput setaf 1)[ERROR]$(tput sgr0)"
-INFO="$(tput setaf 3)[$0]$(tput setaf 4)[INFO]$(tput sgr0)"
-SUCCESS="$(tput setaf 3)[$0]$(tput setaf 2)[SUCCESS]$(tput sgr0)"
 
 usage() {
     echo "Usage: $0 [args]"
