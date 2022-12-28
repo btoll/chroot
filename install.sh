@@ -103,7 +103,7 @@ fi
 CONFIG="[$CHROOT_NAME]\
 \ndescription=Debian ($DEBIAN_RELEASE)\
 \ntype=$TYPE\
-\ndirectory=$CHROOT_DIR/$CHROOT_NAME\
+\ndirectory=$(pwd)/$CHROOT_DIR/$CHROOT_NAME\
 \npersonality=$PERSONALITY\
 \nprofile=$PROFILE\
 \nusers=$CHROOT_USER\
@@ -139,7 +139,7 @@ then
     echo "$SUCCESS Chroot installed in $CHROOT_DIR/$CHROOT_NAME!"
     echo "$INFO You can now enter the chroot by issuing the following command:"
     # If only the `--group` was given and no `--user`, use "USERNAME" as a placeholder.
-    echo -e "\n\tschroot --directory / -u ${CHROOT_USER:-USERNAME} -c $CHROOT_NAME\n"
+    echo -e "\n\tschroot -u ${CHROOT_USER:-USERNAME} -c $CHROOT_NAME -d /\n"
     echo Have fun! Weeeeeeeeeeeee
 else
     echo "$ERROR Something went terribly wrong!" 1>&2
