@@ -34,7 +34,7 @@ then
 fi
 
 ARCH=amd64
-CHROOT_DIR=/srv/chroot
+CHROOT_DIR=
 CHROOT_GROUP=
 CHROOT_NAME=
 CHROOT_USER=
@@ -100,10 +100,16 @@ then
     exit 1
 fi
 
+if [ -z "$CHROOT_DIR" ]
+then
+    CHROOT_DIR="$(pwd)/$CHROOT_NAME"
+    echo "$INFO \`--dir\` not set, defaulting to $CHROOT_DIR (the current working directory + the chroot name)."
+fi
+
 CONFIG="[$CHROOT_NAME]\
 \ndescription=Debian ($DEBIAN_RELEASE)\
 \ntype=$TYPE\
-\ndirectory=$(pwd)/$CHROOT_DIR/$CHROOT_NAME\
+\ndirectory=$CHROOT_DIR\
 \npersonality=$PERSONALITY\
 \nprofile=$PROFILE\
 \nusers=$CHROOT_USER\
