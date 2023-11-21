@@ -53,12 +53,13 @@ usage() {
     echo "-t, --type     : The name of the type of the chroot. Defaults to 'plain'."
     echo "-u, --user     : The name of the chroot user. Must be a user on the host machine."
     echo "-g, --group    : The name of the chroot group. Must be a group on the host machine."
-    echo "-p, --profile  : The name of the chroot group. Must be a group on the host machine."
+    echo "-p, --profile  : The name of the profile. See the README for more information."
     echo "-r, --release  : The Debian release that will be bootstrapped in the jail:"
-    echo "      - jessie    (8)"
-    echo "      - stretch   (9)"
-    echo "      - buster   (10)"
-    echo "      - bullseye (11)"
+    echo "      - jessie     (8)"
+    echo "      - stretch    (9)"
+    echo "      - buster    (10)"
+    echo "      - bullseye  (11)"
+    echo "      - bookworm  (12)"
     echo "--32           : Set this flag if the chroot is to be 32-bit on a 64-bit system."
     echo "--dry-run      : Write the config to STDOUT and exit (will not run the program)."
     echo "-h, --help     : Show usage."
@@ -123,7 +124,7 @@ then
     exit 0
 fi
 
-echo "$INFO Installing the chroot to $CHROOT_DIR/$CHROOT_NAME.  This can take \"a while\" depending on your system resources..."
+echo "$INFO Installing the chroot to $CHROOT_DIR.  This can take \"a while\" depending on your system resources..."
 
 # Create a config entry for the jail.
 echo "$INFO Installing schroot config to /etc/schroot/chroot.d/$CHROOT_NAME."
@@ -132,17 +133,17 @@ echo "$INFO Installing schroot config to /etc/schroot/chroot.d/$CHROOT_NAME."
 echo -e "$CONFIG" > "/etc/schroot/chroot.d/$CHROOT_NAME"
 
 # Create the dir where the jail is installed.
-mkdir -p "$CHROOT_DIR/$CHROOT_NAME"
+mkdir -p "$CHROOT_DIR"
 
 # Finally, create the jail itself.
 #debootstrap --no-check-gpg $DEBIAN_RELEASE /srv/chroot/$CHROOT_NAME file:///home/$CHROOT_USER/mnt
 if debootstrap \
     --arch="$ARCH" \
     --variant=minbase \
-    "$DEBIAN_RELEASE" "$CHROOT_DIR/$CHROOT_NAME" http://deb.debian.org/debian
+    "$DEBIAN_RELEASE" "$CHROOT_DIR" http://deb.debian.org/debian
 then
     # See /etc/schroot/default/copyfiles for files to be copied into the new chroot.
-    echo "$SUCCESS Chroot installed in $CHROOT_DIR/$CHROOT_NAME!"
+    echo "$SUCCESS Chroot installed in $CHROOT_DIR!"
     echo "$INFO You can now enter the chroot by issuing the following command:"
     # If only the `--group` was given and no `--user`, use "USERNAME" as a placeholder.
     echo -e "\n\tschroot -u ${CHROOT_USER:-USERNAME} -c $CHROOT_NAME -d /\n"

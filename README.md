@@ -16,6 +16,7 @@ Creating a chroot by hand is cumbersome and error-prone.  This tool removes the 
 - stretch (9)
 - buster (10)
 - bullseye (11)
+- bookworm (12)
 
 ## Dependencies
 
@@ -39,6 +40,7 @@ Args:
       - stretch   (9)
       - buster   (10)
       - bullseye (11)
+      - bookworm (12)
 --32           : Set this flag if the chroot is to be 32-bit on a 64-bit system.
 --dry-run      : Write the config to STDOUT and exit (will not run the program).
 -h, --help     : Show usage.
@@ -167,6 +169,8 @@ The script will do the following:
     ```
 
     If the command is run again without the `--dry-run` flag, it will install this configuration to `/etc/schroot/chroot.d/onion` and proceed to create the chroot.
+
+    > Since the local user on my machine is a member of the `sudo` group (specified in the example above), I don't need to explicitly add a `--users` param.  If this weren't the case, I would not be able to chroot into the "jail".
 
 - Create the jail in `$CHROOT_DIR` (defaults to `/srv/chroot`). It does this by downloading the version of Debian (specified on the command line) from `http://deb.debian.org/debian`.
 
